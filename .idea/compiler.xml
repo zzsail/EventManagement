@@ -16,4 +16,14 @@
     </annotationProcessing>
     <bytecodeTargetLevel target="17" />
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="EM-Apply" options="-parameters" />
+      <module name="EM-Config" options="-parameters" />
+      <module name="EM-Controller" options="-parameters" />
+      <module name="EM-Mapper" options="-parameters" />
+      <module name="EM-Pojo" options="-parameters" />
+      <module name="EM-Service" options="-parameters" />
+    </option>
+  </component>
 </project>

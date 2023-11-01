@@ -1,5 +1,11 @@
 package com.emt;
 
-public class App {
+import org.springframework.boot.SpringApplication;
 
+import javax.swing.*;
+
+public class App {
+    public static void main(String[] args) {
+        SpringApplication.run(App.class,args);
+    }
 }
