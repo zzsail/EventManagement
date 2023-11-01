@@ -10,11 +10,13 @@ public class User {
     private String userName;//用户名
     private String email;//用户邮箱
     private String password;//密码密码
-    private Integer power;//用户权限
-    private Integer status;//用户状态
+    //用户权限 1为最高权限 2为管理员 3为用户
+    private Integer power;
+    //用户状态 0表示离线 1表示在线
+    private Integer status;
     private LocalDateTime lastLoginTime;//最近登录时间
     private LocalDateTime registerTime;//注册时间
-    private Boolean ban;//是否封禁
+    //是否封禁 0表示封禁 1表示正常
+    private Boolean ban;
     private Boolean exist;//是否存在
-
 }
