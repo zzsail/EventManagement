@@ -11,5 +11,5 @@ public class Event {
     private LocalDateTime eventDate;
     private String eventLocation;
     private String eventDescription;
-    private EventCategory category;
+    private Long categoryId;
 }

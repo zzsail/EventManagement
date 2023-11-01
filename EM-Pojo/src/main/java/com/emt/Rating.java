@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 @Data
 public class Rating {
     private Long ratingId;
-    private Event event;
-    private Participant participant;
+    private Long eventId;
+    private Long participantId;
     private BigDecimal ratingValue;
     private String ratingComments;
 }

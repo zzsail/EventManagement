@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class Award {
     private Long awardId;
-    private Event event;
+    Long eventId;
     private String awardName;
     private String awardDescription;
 }

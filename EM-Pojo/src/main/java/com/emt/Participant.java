@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 public class Participant {
     private Long participantId;
-    private Event event;
+    private Long eventId;
     private String participantName;
     private Integer participantAge;
     private String participantTeam;

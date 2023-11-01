@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 public class AwardWinner {
     private Long winnerId;
-    private Award award;
+    private Long awardId;
     private Participant participant;
     private LocalDateTime awardDate;
 }

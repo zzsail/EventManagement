@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 @Data
 public class Record {
     private Long recordId;
-    private Event event;
-    private Participant participant;
+    private Long eventId;
+    private Long participantId;
     private String recordDetails;
     private LocalDateTime recordDate;
 }
