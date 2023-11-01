@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 //赛事信息表（Events）实体类
 @Data
 public class Event {
-    private Long eventId;
-    private String eventName;
-    private LocalDateTime eventDate;
-    private String eventLocation;
-    private String eventDescription;
-    private Long categoryId;
-    private Boolean exist;
+    private Long eventId;//赛事ID
+    private String eventName;//赛事名称
+    private LocalDateTime eventDate;//赛事日期
+    private String eventLocation;//赛事地点
+    private String eventDescription;//赛事描述
+    private Long categoryId;//分类ID
+    private Boolean exist;//是否存在（1表示存在，0表示删除）
 }

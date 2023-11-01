@@ -5,9 +5,9 @@ import lombok.Data;
 
 @Data
 public class Award {
-    private Long awardId;
-    private Long eventId;
-    private String awardName;
-    private String awardDescription;
-    private Boolean exist;
+    private Long awardId;//奖项ID
+    private Long eventId;//赛事ID
+    private String awardName;//奖项名称
+    private String awardDescription;//奖项描述
+    private Boolean exist;//是否存在（1表示存在，0表示删除）
 }
