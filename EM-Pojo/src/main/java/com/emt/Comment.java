@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 public class Comment {
     private Long commentId;
     private Long eventId;
-    private Long participantId;
+    private Long userId;
     private String commentText;
     private LocalDateTime commentDate;
     private Boolean exist;

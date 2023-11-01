@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public class Rating {
     private Long ratingId;
     private Long eventId;
-    private Long participantId;
+    private Long userId;
     private BigDecimal ratingValue;
     private String ratingComments;
     private Boolean exist;
