@@ -12,4 +12,5 @@ public class Event {
     private String eventLocation;
     private String eventDescription;
     private Long categoryId;
+    private Boolean exist;
 }

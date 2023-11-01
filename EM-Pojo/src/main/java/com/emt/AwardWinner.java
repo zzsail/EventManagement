@@ -12,4 +12,5 @@ public class AwardWinner {
     private Long awardId;
     private Participant participant;
     private LocalDateTime awardDate;
+    private Boolean exist;
 }

@@ -1,6 +1,6 @@
 package com.emt;
 
-import com.sun.jdi.IntegerType;
+
 import lombok.Data;
 
 //赛事参赛者信息表（Participants）实体类
@@ -12,4 +12,5 @@ public class Participant {
     private Integer participantAge;
     private String participantTeam;
     private String participantContactInfo;
+    private Boolean exist;
 }

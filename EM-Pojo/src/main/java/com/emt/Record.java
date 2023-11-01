@@ -11,4 +11,5 @@ public class Record {
     private Long participantId;
     private String recordDetails;
     private LocalDateTime recordDate;
+    private Boolean exist;
 }

@@ -8,4 +8,5 @@ public class EventCategory {
     private Long categoryId;
     private String categoryName;
     private String categoryDescription;
+    private Boolean exist;
 }

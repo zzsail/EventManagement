@@ -9,4 +9,5 @@ public class Award {
     private Long eventId;
     private String awardName;
     private String awardDescription;
+    private Boolean exist;
 }

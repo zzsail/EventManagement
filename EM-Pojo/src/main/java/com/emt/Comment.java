@@ -11,4 +11,5 @@ public class Comment {
     private Long participantId;
     private String commentText;
     private LocalDateTime commentDate;
+    private Boolean exist;
 }

@@ -11,4 +11,5 @@ public class Rating {
     private Long participantId;
     private BigDecimal ratingValue;
     private String ratingComments;
+    private Boolean exist;
 }
