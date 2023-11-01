@@ -7,6 +7,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="EM-Pojo" />
+        <module name="EM-Controller" />
+        <module name="EM-Service" />
+        <module name="EM-Mapper" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="17" />
