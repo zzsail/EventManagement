@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/EM-Apply/EM-Apply.iml" filepath="$PROJECT_DIR$/EM-Apply/EM-Apply.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EM-Mapper/EM-Mapper.iml" filepath="$PROJECT_DIR$/EM-Mapper/EM-Mapper.iml" />
+    </modules>
+  </component>
+</project>
