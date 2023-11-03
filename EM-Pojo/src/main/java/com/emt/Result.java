@@ -9,7 +9,7 @@ import java.util.Map;
 public class Result {
     private Map<String, Object> data;
     private Integer code;
-    private String msg;
+    private String message;
 
     public static Result success(Map<String, Object> map){
         Result r = new Result();
@@ -28,7 +28,7 @@ public class Result {
     public static Result error(String msg){
         Result r = new Result();
         r.code = Code.ERR;
-        r.msg = msg;
+        r.message = msg;
         return r;
     }
 

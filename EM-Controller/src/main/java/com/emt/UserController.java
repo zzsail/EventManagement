@@ -22,15 +22,16 @@ public class UserController {
     public Result login(@RequestBody User user){
         String userName = user.getUsername();
         // 将密码转为md5格式
-        String password = DigestUtils
-                .md5DigestAsHex(
-                        user.getPassword().getBytes()
-                );
+        String password = user.getPassword();
+//        String password = DigestUtils
+//                .md5DigestAsHex(
+//                        user.getPassword().getBytes()
+//                );
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(StringUtils.hasText(userName), User::getUsername, userName);
         user = userService.getOne(lqw);
         if(user != null){
-            if (!user.getBan()) {//查看是否封禁
+            if (user.getBan()) {//查看是否封禁
                 if(password.equals(user.getPassword())){//比较密码
                     //设置token
                     String token = JwtUtil.GenerateJwt(user.getUsername() +
