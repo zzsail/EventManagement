@@ -1,6 +1,7 @@
 package com.emt;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpSession;
 import lombok.val;
@@ -10,6 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 @CrossOrigin
 @RestController
@@ -58,6 +60,17 @@ public class UserController {
         map.put("userId", split[2]);
         return Result.success(map);
     }
+
+    //登出
+    @PostMapping("/logout")
+    public Result logout(){
+        Map<String,Object> map = new HashMap<>();
+        map.put("token","");
+        return Result.success(new HashMap<>());
+    }
+
+
+
 
 
 
