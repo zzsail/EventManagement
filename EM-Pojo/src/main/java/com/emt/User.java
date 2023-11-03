@@ -12,6 +12,8 @@ public class User {
     private String password;//密码密码
     //用户权限 1为最高权限 2为管理员 3为用户
     private Integer power;
+    private String gender;//用户性别
+    private Integer age;//用户年龄
     //用户状态 0表示离线 1表示在线
     private Integer status;
     private LocalDateTime lastLoginTime;//最近登录时间

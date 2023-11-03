@@ -10,6 +10,7 @@ public class Participant {
     private Long userId;//用户ID
     private Long eventId;//赛事ID
     private String participantName;//参赛者姓名
+    private String participantGender;//参赛者性别
     private Integer participantAge;//参赛者年龄
     private String participantTeam;//参赛者队伍
     private String participantContactInfo;//联系信息
