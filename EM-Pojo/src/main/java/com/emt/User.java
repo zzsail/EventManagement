@@ -1,11 +1,14 @@
 package com.emt;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 //用户表
 @Data
 public class User {
+    @TableId(value = "user_id", type = IdType.ASSIGN_ID)
     private Long userId;//用户id
     private String userName;//用户名
     private String email;//用户邮箱

@@ -1,6 +1,8 @@
 package com.emt;
 
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -8,6 +10,7 @@ import java.time.LocalDateTime;
 //赛事获奖者信息表（AwardWinners）实体类
 @Data
 public class AwardWinner {
+    @TableId(value = "winner_id", type = IdType.ASSIGN_ID)
     private Long winnerId;//获奖者ID
     private Long awardId;//奖项ID
     private Participant participant;//参赛者ID

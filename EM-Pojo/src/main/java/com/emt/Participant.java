@@ -1,11 +1,14 @@
 package com.emt;
 
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 //赛事参赛者信息表（Participants）实体类
 @Data
 public class Participant {
+    @TableId(value = "participant_id", type = IdType.ASSIGN_ID)
     private Long participantId;//参赛者ID
     private Long userId;//用户ID
     private Long eventId;//赛事ID
