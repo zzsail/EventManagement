@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class JwtUtil {
     //设置密钥
-    public static String signKey = "EMT";
+    public static String signKey = "Lionzz";
     //设置过期时间
     public static Long expire = 43200000L;
 
