@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class User {
     @TableId(value = "user_id", type = IdType.ASSIGN_ID)
     private Long userId;//用户id
-    private String userName;//用户名
+    private String username;//用户名
     private String email;//用户邮箱
     private String password;//密码密码
     //用户权限 1为最高权限 2为管理员 3为用户

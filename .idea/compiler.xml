@@ -6,11 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="EM-Pojo" />
         <module name="EM-Controller" />
         <module name="EM-Service" />
-        <module name="EM-Apply" />
+        <module name="EM-Util" />
         <module name="EM-Mapper" />
+        <module name="EM-Pojo" />
+        <module name="EM-Apply" />
         <module name="EM-Config" />
       </profile>
     </annotationProcessing>
@@ -24,6 +25,7 @@
       <module name="EM-Mapper" options="-parameters" />
       <module name="EM-Pojo" options="-parameters" />
       <module name="EM-Service" options="-parameters" />
+      <module name="EM-Util" options="-parameters" />
     </option>
   </component>
 </project>
