@@ -21,6 +21,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    private String IS_EXIST = "1";
+
     @PostMapping("/login")
     public Result login(@RequestBody User user){
         String userName = user.getUsername();
@@ -70,6 +72,7 @@ public class UserController {
     }
 
 
+    //用户注册
     @PostMapping(path = "/register")
     public Result register(@RequestBody User user){
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
@@ -85,11 +88,13 @@ public class UserController {
                 );
         user.setPassword(password);
         user.setRegisterTime(LocalDateTime.now());
-        user.setPower(1);
+        user.setPower(3);
         userService.save(user);
         return Result.success();
     }
 
+
+    //完善用户信息
     @PostMapping(path = "/improveInfo")
     public Result improveInfo(@RequestBody User user){
         String gender = user.getGender();
@@ -105,8 +110,22 @@ public class UserController {
         userService.saveOrUpdate(one);
         return Result.success();
 
-
     }
+
+    @GetMapping("/page")
+    public Result page(@RequestBody Integer pageNum, Integer pageSize, String username){
+        Page<User> pages = new Page<>(pageNum, pageSize);
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.like(StringUtils.hasText(username), User::getUsername, username);
+        lqw.eq(User::getExist, IS_EXIST);
+        lqw.orderByDesc(User::getLastUpdateTime);
+        userService.page(pages, lqw);
+        Map<String,Object> map = new HashMap<>();
+        map.put("items",pages);
+        return Result.success(map);
+    }
+
+
 
 
 

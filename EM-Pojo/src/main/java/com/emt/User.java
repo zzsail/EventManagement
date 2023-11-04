@@ -19,7 +19,7 @@ public class User {
     private Integer age;//用户年龄
     //用户状态 0表示离线 1表示在线
     private Integer status;
-    private LocalDateTime lastLoginTime;//最近登录时间
+    private LocalDateTime lastUpdateTime;//最近登录时间
     private LocalDateTime registerTime;//注册时间
     //是否封禁 0表示封禁 1表示正常
     private Boolean ban;
