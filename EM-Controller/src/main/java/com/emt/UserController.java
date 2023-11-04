@@ -10,6 +10,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,27 @@ public class UserController {
         Map<String,Object> map = new HashMap<>();
         map.put("token","");
         return Result.success(new HashMap<>());
+    }
+
+
+    @PostMapping(path = "/register")
+    public Result register(@RequestBody User user){
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(User::getUsername ,user.getUsername());
+        if(userService.getOne(lqw) != null){
+            return Result.error("用户名已存在");
+        }
+        if(user.getPassword().length() < 6){
+            return Result.error("密码不能少于6位");
+        }
+        String password = DigestUtils.md5DigestAsHex(
+                        user.getPassword().getBytes()
+                );
+        user.setPassword(password);
+        user.setRegisterTime(LocalDateTime.now());
+        user.setPower(1);
+        userService.save(user);
+        return Result.success();
     }
 
 
