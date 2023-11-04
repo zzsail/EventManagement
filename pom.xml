@@ -20,6 +20,7 @@
         <module>EM-Mapper</module>
         <module>EM-Apply</module>
         <module>EM-Config</module>
+        <module>EM-Util</module>
     </modules>
 
     <properties>
@@ -31,6 +32,8 @@
         <druid.version>1.2.6</druid.version>
         <mysql.version>8.0.33</mysql.version>
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <jjwt.version>0.9.1</jjwt.version>
+        <jaxb.version>2.3.1</jaxb.version>
     </properties>
 
     <dependencyManagement>
@@ -54,6 +57,16 @@
                 <groupId>com.mysql</groupId>
                 <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${jaxb.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
