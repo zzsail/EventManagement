@@ -91,6 +91,19 @@ public class UserController {
         return Result.success();
     }
 
+    @PostMapping(path = "/improveInfo")
+    public Result improveInfo(@RequestBody User user){
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(User::getUsername ,user.getUsername());
+        if(userService.getOne(lqw) == null){
+            return Result.error("用户名不存在");
+        }
+        userService.saveOrUpdate(user);
+        return Result.success();
+
+
+    }
+
 
 
 
