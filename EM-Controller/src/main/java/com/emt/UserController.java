@@ -25,11 +25,10 @@ public class UserController {
     public Result login(@RequestBody User user){
         String userName = user.getUsername();
         // 将密码转为md5格式
-        String password = user.getPassword();
-//        String password = DigestUtils
-//                .md5DigestAsHex(
-//                        user.getPassword().getBytes()
-//                );
+       String password = DigestUtils
+               .md5DigestAsHex(
+                       user.getPassword().getBytes()
+               );
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(StringUtils.hasText(userName), User::getUsername, userName);
         user = userService.getOne(lqw);
@@ -93,12 +92,17 @@ public class UserController {
 
     @PostMapping(path = "/improveInfo")
     public Result improveInfo(@RequestBody User user){
+        String gender = user.getGender();
+        Integer age = user.getAge();
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUsername ,user.getUsername());
-        if(userService.getOne(lqw) == null){
+        User one = userService.getOne(lqw);
+        if(one == null){
             return Result.error("用户名不存在");
         }
-        userService.saveOrUpdate(user);
+        one.setAge(age);
+        one.setGender(gender);
+        userService.saveOrUpdate(one);
         return Result.success();
 
 
