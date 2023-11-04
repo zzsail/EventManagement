@@ -1,10 +1,6 @@
 package com.emt;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpSession;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
@@ -12,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 @CrossOrigin
 @RestController
@@ -33,7 +28,7 @@ public class UserController {
         lqw.eq(StringUtils.hasText(userName), User::getUsername, userName);
         user = userService.getOne(lqw);
         if(user != null){
-            if (user.getBan()) {//查看是否封禁
+            if (!user.getBan()) {//查看是否封禁
                 if(password.equals(user.getPassword())){//比较密码
                     //设置token
                     String token = JwtUtil.GenerateJwt(user.getUsername() +
@@ -85,7 +80,8 @@ public class UserController {
                 );
         user.setPassword(password);
         user.setRegisterTime(LocalDateTime.now());
-        user.setPower(1);
+        user.setLastUpdateTime(LocalDateTime.now());
+        user.setPower(3);
         userService.save(user);
         return Result.success();
     }
