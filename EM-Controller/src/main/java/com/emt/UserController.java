@@ -45,6 +45,9 @@ public class UserController {
                     map.put("token", token);
                     return Result.success(map);
                 }
+                else{
+                    Result.error("用户名或密码错误");
+                }
             }
             return Result.error("该用户已被封禁");
         }else {
