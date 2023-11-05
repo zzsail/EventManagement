@@ -116,7 +116,7 @@ public class UserController {
     }
 
     @GetMapping("/page")
-    public Result page(@RequestBody Integer pageNum, Integer pageSize, String username){
+    public Result page(Integer pageNum, Integer pageSize, String username){
         Page<User> pages = new Page<>(pageNum, pageSize);
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.like(StringUtils.hasText(username), User::getUsername, username);
