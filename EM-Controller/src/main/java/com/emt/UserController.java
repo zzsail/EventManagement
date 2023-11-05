@@ -141,6 +141,32 @@ public class UserController {
 
 
 
+    //启用用户(修改用户状态)
+    @PostMapping("/status/0")
+    public Result startUser(Long userId){
+        User user = userService.getById(userId);
+        user.setExist(true);
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(User::getUserId, userId);
+        userService.update(user, lqw);
+        return Result.success();
+    }
+
+    //删除用户
+    @PostMapping("/status/1")
+    public Result stopUser(Long userId){
+        User user = userService.getById(userId);
+        user.setExist(false);
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(User::getUserId, userId);
+        userService.update(user, lqw);
+        return Result.success();
+    }
+
+
+
+
+
 
 
 
