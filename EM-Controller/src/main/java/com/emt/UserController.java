@@ -46,8 +46,7 @@ public class UserController {
                     Map<String, Object> map = new HashMap<>();
                     map.put("token", token);
                     return Result.success(map);
-                }
-                else{
+                } else{
                     Result.error("用户名或密码错误");
                 }
             }
@@ -148,6 +147,9 @@ public class UserController {
     @PostMapping("/status/0")
     public Result startUser(Long userId){
         User user = userService.getById(userId);
+        if(user == null){
+            return Result.error("该用户不存在");
+        }
         user.setExist(true);
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUserId, userId);
@@ -159,6 +161,9 @@ public class UserController {
     @PostMapping("/status/1")
     public Result stopUser(Long userId){
         User user = userService.getById(userId);
+        if(user == null){
+            return Result.error("该用户不存在");
+        }
         user.setExist(false);
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUserId, userId);
