@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpSession;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class UserController {
     private UserService userService;
 
     private String IS_EXIST = "1";
+    private String IS_NOT_EXIST = "0";
 
     @PostMapping("/login")
     public Result login(@RequestBody User user){
@@ -124,6 +126,19 @@ public class UserController {
         map.put("items",pages);
         return Result.success(map);
     }
+
+    //修改用户信息
+    @Transactional
+    @PutMapping("/update")
+    public Result update(@RequestBody User user){
+        try {
+            userService.updateById(user);
+        } catch (Exception e) {
+            return Result.error("用户名已存在");
+        }
+        return Result.success();
+    }
+
 
 
 
