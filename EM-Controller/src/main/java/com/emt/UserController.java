@@ -143,7 +143,7 @@ public class UserController {
 
 
 
-    //启用用户(修改用户状态)
+    //启用用户
     @PostMapping("/delete/0")
     public Result startUser(Long userId){
         User user = userService.getById(userId);
@@ -173,6 +173,7 @@ public class UserController {
         return Result.success();
     }
 
+    //启用用户
     @PostMapping("/status/0")
     public Result unblock(Long userId){
         User user = userService.getById(userId);
@@ -187,7 +188,7 @@ public class UserController {
         return Result.success();
     }
 
-    //删除用户
+    //禁用用户
     @PostMapping("/status/1")
     public Result ban(Long userId){
         User user = userService.getById(userId);

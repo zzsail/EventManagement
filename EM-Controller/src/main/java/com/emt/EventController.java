@@ -3,6 +3,7 @@ package com.emt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,5 +32,17 @@ public class EventController {
         Map<String, Object> map = new HashMap<>();
         map.put("items", pages);
         return Result.success(map);
+    }
+
+    //修改赛事信息
+    @Transactional
+    @PutMapping("/update")
+    public Result update(@RequestBody Event event){
+        try {
+            eventService.updateById(event);
+        } catch (Exception e) {
+            return Result.error("赛事Id已存在");
+        }
+        return Result.success();
     }
 }
