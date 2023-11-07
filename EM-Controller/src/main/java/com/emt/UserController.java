@@ -189,8 +189,37 @@ public class UserController {
 
     }
 
+    //查询用户名是否存在
+    @GetMapping("/checkUsername")
+    public Result checkUsername(String username){
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(User::getUsername, username);
+        User user = userService.getOne(lqw);
+        Map<String, Object> map = new HashMap<>();
+        if(user == null){
+            map.put("isUsernameValid", false);
+        }else {
+            map.put("isUsernameValid", true);
+        }
 
+        return Result.success(map);
 
+    }
+    //查询邮箱是否存在
+    @GetMapping("/checkEmail")
+    public Result checkEmail(String email){
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(User::getEmail, email);
+        User user = userService.getOne(lqw);
+        Map<String, Object> map = new HashMap<>();
+        if (user == null){
+            map.put("isEmailValid", false);
+        }else {
+            map.put("isEmailValid", true);
+        }
+
+        return Result.success(map);
+    }
 
 
 
