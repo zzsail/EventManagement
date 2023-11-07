@@ -144,13 +144,43 @@ public class UserController {
 
 
     //启用用户(修改用户状态)
-    @PostMapping("/status/0")
+    @PostMapping("/delete/0")
     public Result startUser(Long userId){
         User user = userService.getById(userId);
         if(user == null){
             return Result.error("该用户不存在");
         }
         user.setExist(true);
+        user.setLastUpdateTime(LocalDateTime.now());
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(User::getUserId, userId);
+        userService.update(user, lqw);
+        return Result.success();
+    }
+
+    //删除用户
+    @PostMapping("/delete/1")
+    public Result stopUser(Long userId){
+        User user = userService.getById(userId);
+        if(user == null){
+            return Result.error("该用户不存在");
+        }
+        user.setExist(false);
+        user.setLastUpdateTime(LocalDateTime.now());
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(User::getUserId, userId);
+        userService.update(user, lqw);
+        return Result.success();
+    }
+
+    @PostMapping("/status/0")
+    public Result unblock(Long userId){
+        User user = userService.getById(userId);
+        if(user == null){
+            return Result.error("该用户不存在");
+        }
+        user.setBan(true);
+        user.setLastUpdateTime(LocalDateTime.now());
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUserId, userId);
         userService.update(user, lqw);
@@ -159,12 +189,13 @@ public class UserController {
 
     //删除用户
     @PostMapping("/status/1")
-    public Result stopUser(Long userId){
+    public Result ban(Long userId){
         User user = userService.getById(userId);
         if(user == null){
             return Result.error("该用户不存在");
         }
-        user.setExist(false);
+        user.setBan(false);
+        user.setLastUpdateTime(LocalDateTime.now());
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUserId, userId);
         userService.update(user, lqw);
