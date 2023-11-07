@@ -149,7 +149,7 @@ public class UserController {
         if(user == null){
             return Result.error("该用户不存在");
         }
-        user.setExist(false);//逻辑删除
+        user.setExist(IS_NOT_EXIST);//逻辑删除
         user.setLastUpdateTime(LocalDateTime.now());//更新操作时间
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUserId, userId);
