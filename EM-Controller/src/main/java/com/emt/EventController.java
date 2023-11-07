@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @CrossOrigin
@@ -73,4 +74,19 @@ public class EventController {
         eventService.update(event, lqw);
         return Result.success();
     }
+
+    //查询赛事
+    @GetMapping("/select")
+    public Result select(String eventName){
+        LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
+        lqw.like(Event::getEventName, eventName);
+        List<Event> events = eventService.list(lqw);
+        Map<String, Object> eventMap = new HashMap<>();
+        //将查询到的数据存入map中
+        for (Event event : events) {
+            eventMap.put(event.getEventName(), event);
+        }
+        return Result.success(eventMap);
+    }
+
 }

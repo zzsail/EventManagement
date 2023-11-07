@@ -172,8 +172,22 @@ public class UserController {
         return Result.success();
     }
 
+    //查询用户
+    @GetMapping("/select")
+    public Result select(String username){
+        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
+        lqw.like(User::getUsername, username);
+        List<User> users = userService.list(lqw);
+        Map<String, Object> userMap = new HashMap<>();
+        //将查询到的list数据存入map中
+        for (User user : users) {
+            userMap.put(user.getUsername(), user);
+        }
+
+        return Result.success(userMap);
 
 
+    }
 
 
 
