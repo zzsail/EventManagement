@@ -22,8 +22,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    private String IS_EXIST = "1";
-    private String IS_NOT_EXIST = "0";
+    private final Boolean IS_EXIST = true;
+    private final Boolean IS_NOT_EXIST = false;
 
     @PostMapping("/login")
     public Result login(@RequestBody User user){
@@ -134,6 +134,7 @@ public class UserController {
     @PutMapping("/update")
     public Result update(@RequestBody User user){
         try {
+            user.setLastUpdateTime(LocalDateTime.now());//更新操作时间
             userService.updateById(user);
         } catch (Exception e) {
             return Result.error("用户名已存在");
@@ -141,66 +142,36 @@ public class UserController {
         return Result.success();
     }
 
-
-
-    //启用用户(修改用户状态)
-    @PostMapping("/delete/0")
-    public Result startUser(Long userId){
-        User user = userService.getById(userId);
-        if(user == null){
-            return Result.error("该用户不存在");
-        }
-        user.setExist(true);
-        user.setLastUpdateTime(LocalDateTime.now());
-        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(User::getUserId, userId);
-        userService.update(user, lqw);
-        return Result.success();
-    }
-
     //删除用户
-    @PostMapping("/delete/1")
-    public Result stopUser(Long userId){
+    @PostMapping("/delete")
+    public Result deleteUser(Long userId){
         User user = userService.getById(userId);
         if(user == null){
             return Result.error("该用户不存在");
         }
-        user.setExist(false);
-        user.setLastUpdateTime(LocalDateTime.now());
+        user.setExist(false);//逻辑删除
+        user.setLastUpdateTime(LocalDateTime.now());//更新操作时间
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUserId, userId);
         userService.update(user, lqw);
         return Result.success();
     }
 
-    @PostMapping("/status/0")
-    public Result unblock(Long userId){
-        User user = userService.getById(userId);
-        if(user == null){
-            return Result.error("该用户不存在");
-        }
-        user.setBan(true);
-        user.setLastUpdateTime(LocalDateTime.now());
-        LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(User::getUserId, userId);
-        userService.update(user, lqw);
-        return Result.success();
-    }
-
-    //删除用户
-    @PostMapping("/status/1")
+    //封解禁用户
+    @PostMapping("/ban")
     public Result ban(Long userId){
         User user = userService.getById(userId);
         if(user == null){
             return Result.error("该用户不存在");
         }
-        user.setBan(false);
-        user.setLastUpdateTime(LocalDateTime.now());
+        user.setBan(!user.getBan());
+        user.setLastUpdateTime(LocalDateTime.now());//更新操作时间
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUserId, userId);
         userService.update(user, lqw);
         return Result.success();
     }
+
 
 
 
