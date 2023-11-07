@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +44,21 @@ public class EventController {
         } catch (Exception e) {
             return Result.error("赛事Id已存在");
         }
+        return Result.success();
+    }
+
+    //删除赛事
+    @PostMapping("/delete")
+    public Result delete(Long eventId){
+        Event event = eventService.getById(eventId);
+        if(event == null){
+            return Result.error("该赛事不存在");
+        }
+        event.setExist(false);
+
+        LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Event::getEventId, eventId);
+        eventService.update(event, lqw);
         return Result.success();
     }
 }
