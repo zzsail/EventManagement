@@ -35,6 +35,18 @@ public class EventController {
         return Result.success(map);
     }
 
+    //添加赛事
+    @PostMapping(path = "/save")
+    public Result saveEvent(@RequestBody Event event){
+        LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Event::getEventName, event.getEventName());
+        if(eventService.getOne(lqw) != null){
+            return Result.error("赛事名已存在");
+        }
+        eventService.save(event);
+        return Result.success();
+    }
+
     //修改赛事信息
     @Transactional
     @PutMapping("/update")
