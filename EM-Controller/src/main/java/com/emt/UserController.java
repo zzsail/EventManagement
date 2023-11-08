@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/user")
@@ -35,6 +37,7 @@ public class UserController {
                );
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(StringUtils.hasText(userName), User::getUsername, userName);
+        lqw.eq(User::getExist,IS_EXIST);
         user = userService.getOne(lqw);
         if(user != null){
             if (user.getBan()) {//查看是否封禁
@@ -87,11 +90,10 @@ public class UserController {
         if(user.getPassword().length() < 6){
             return Result.error("密码不能少于6位");
         }
-        String password = DigestUtils.md5DigestAsHex(
-                        user.getPassword().getBytes()
-                );
+        String password = DigestUtils.md5DigestAsHex(user.getPassword().getBytes());
         user.setPassword(password);
         user.setRegisterTime(LocalDateTime.now());
+        user.setLastUpdateTime(LocalDateTime.now());
         user.setPower(3);
         user.setGender("未知");//设置默认性别
         user.setAge(0);//设置默认年龄
@@ -130,7 +132,16 @@ public class UserController {
         map.put("items",pages);
         return Result.success(map);
     }
-
+    @PostMapping("/create")
+    public Result create(@RequestBody User user){
+        user.setRegisterTime(LocalDateTime.now());
+        user.setLastUpdateTime(LocalDateTime.now());
+        user.setPassword(DigestUtils.md5DigestAsHex(user.getPassword().getBytes()));
+        userService.save(user);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("user",user);
+        return Result.success(map);
+    }
     //修改用户信息
     @Transactional
     @PutMapping("/update")
@@ -154,6 +165,8 @@ public class UserController {
             return Result.error("该用户不存在");
         }
         user.setExist(IS_NOT_EXIST);//逻辑删除
+        user.setUsername(user.getUsername() + '$' + UUID.randomUUID());//生成原用户名+uuid
+        user.setEmail(user.getEmail() + '$' + UUID.randomUUID());//生成原邮箱+uuid
         user.setLastUpdateTime(LocalDateTime.now());//更新操作时间
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUserId, userId);
@@ -183,13 +196,12 @@ public class UserController {
     public Result select(String username){
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.like(User::getUsername, username);
+        lqw.eq(User::getExist,IS_EXIST);
         List<User> users = userService.list(lqw);
-        Map<String, Object> userMap = new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         //将查询到的list数据存入map中
-        for (User user : users) {
-            userMap.put(user.getUsername(), user);
-        }
-        return Result.success(userMap);
+        map.put("users",users);
+        return Result.success(map);
 
 
     }
@@ -199,6 +211,7 @@ public class UserController {
     public Result checkUsername(String username){
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUsername, username);
+        lqw.eq(User::getExist,IS_EXIST);
         User user = userService.getOne(lqw);
         Map<String, Object> map = new HashMap<>();
         if(user == null){
@@ -215,7 +228,9 @@ public class UserController {
     public Result checkEmail(String email){
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getEmail, email);
+        lqw.eq(User::getExist,IS_EXIST);
         User user = userService.getOne(lqw);
+
         Map<String, Object> map = new HashMap<>();
         if (user == null){
             map.put("isEmailValid", false);
