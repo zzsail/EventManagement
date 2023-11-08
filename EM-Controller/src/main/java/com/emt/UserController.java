@@ -182,7 +182,7 @@ public class UserController {
             return Result.error("该用户不存在");
         }
         user.setBan(!user.getBan());
-        user.setLastUpdateTime(LocalDateTime.now());//更新操作时间,毫秒值设为0
+        user.setLastUpdateTime(LocalDateTime.now());//更新操作时间
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUserId, userId);
         userService.update(user, lqw);
@@ -202,8 +202,6 @@ public class UserController {
         //将查询到的list数据存入map中
         map.put("users",users);
         return Result.success(map);
-
-
     }
 
     //查询用户名是否存在
