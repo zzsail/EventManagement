@@ -93,6 +93,8 @@ public class UserController {
         user.setPassword(password);
         user.setRegisterTime(LocalDateTime.now());
         user.setPower(3);
+        user.setGender("未知");//设置默认性别
+        user.setAge(0);//设置默认年龄
         userService.save(user);
         return Result.success();
     }
@@ -139,7 +141,9 @@ public class UserController {
         } catch (Exception e) {
             return Result.error("用户名已存在");
         }
-        return Result.success();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("user",user);
+        return Result.success(map);
     }
 
     //删除用户
@@ -165,11 +169,13 @@ public class UserController {
             return Result.error("该用户不存在");
         }
         user.setBan(!user.getBan());
-        user.setLastUpdateTime(LocalDateTime.now());//更新操作时间
+        user.setLastUpdateTime(LocalDateTime.now());//更新操作时间,毫秒值设为0
         LambdaQueryWrapper<User> lqw = new LambdaQueryWrapper<>();
         lqw.eq(User::getUserId, userId);
         userService.update(user, lqw);
-        return Result.success();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("user",user);
+        return Result.success(map);
     }
 
     //查询用户
@@ -183,7 +189,6 @@ public class UserController {
         for (User user : users) {
             userMap.put(user.getUsername(), user);
         }
-
         return Result.success(userMap);
 
 
