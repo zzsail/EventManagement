@@ -2,6 +2,7 @@ package com.emt;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.emt.composite.EventComposite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -19,6 +20,8 @@ public class EventController {
 
     @Autowired
     private EventService eventService;
+    @Autowired
+    private EventCategoryService eventCategoryService;
 
     private final Boolean IS_EXIST = true;
     private final Boolean IS_NOT_EXIST = false;
@@ -39,12 +42,27 @@ public class EventController {
 
     //添加赛事
     @PostMapping(path = "/create")
-    public Result saveEvent(@RequestBody Event event){
+    public Result saveEvent(@RequestBody EventComposite eventComposite){
         LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(Event::getEventName, event.getEventName());
-        if(eventService.getOne(lqw) != null) {
-            return Result.error("赛事名已存在");
+        lqw.eq(Event::getEventName, eventComposite.getEventName());
+        lqw.eq(Event::getExist, IS_EXIST);
+        Event one = eventService.getOne(lqw);
+        if (one != null){
+            return Result.error("该赛事已存在");
         }
+        Event event = new Event();
+        event.setEventName(eventComposite.getEventName());
+        event.setEventDate(eventComposite.getEventDate());
+        event.setEventLocation(eventComposite.getEventLocation());
+        event.setEventDescription(eventComposite.getEventDescription());
+        String category = eventComposite.getCategoryName();
+        LambdaQueryWrapper<EventCategory> lqw2 = new LambdaQueryWrapper<>();
+        lqw2.eq(EventCategory::getCategoryName, category);
+        EventCategory one1 = eventCategoryService.getOne(lqw2);
+        if(one1 == null){
+            return Result.error("该分类不存在");
+        }
+        event.setCategoryId(one1.getCategoryId());
         eventService.save(event);
         return Result.success();
     }
