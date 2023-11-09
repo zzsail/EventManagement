@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -20,7 +21,8 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
-    private String IS_EXIST = "1";
+    private final Boolean IS_EXIST = true;
+    private final Boolean IS_NOT_EXIST = false;
 
     //分页查询
     @GetMapping("/page")
@@ -67,7 +69,8 @@ public class EventController {
         if(event == null){
             return Result.error("该赛事不存在");
         }
-        event.setExist(false);
+        event.setExist(IS_NOT_EXIST);
+        event.setEventName(event.getEventName() + '$' + UUID.randomUUID()); //生成原赛事名＋uuid
 
         LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
         lqw.eq(Event::getEventId, eventId);
@@ -80,12 +83,10 @@ public class EventController {
     public Result select(String eventName){
         LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
         lqw.like(Event::getEventName, eventName);
+        lqw.eq(Event::getExist, IS_EXIST);
         List<Event> events = eventService.list(lqw);
         Map<String, Object> eventMap = new HashMap<>();
-        //将查询到的数据存入map中
-        for (Event event : events) {
-            eventMap.put(event.getEventName(), event);
-        }
+        eventMap.put("events", events);
         return Result.success(eventMap);
     }
 

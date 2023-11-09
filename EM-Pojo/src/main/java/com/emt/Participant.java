@@ -15,7 +15,6 @@ public class Participant {
     private String participantName;//参赛者姓名
     private String participantGender;//参赛者性别
     private Integer participantAge;//参赛者年龄
-    private String participantTeam;//参赛者队伍
     private String participantContactInfo;//联系信息
     private Boolean exist;//是否存在（1表示存在，0表示删除）
 }
