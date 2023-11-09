@@ -9,6 +9,7 @@ import java.math.BigInteger;
 
 @Data
 public class EventComposite extends Event {
+    private String categoryName;
     private BigDecimal ratingValue;
     private BigInteger participantNum;
 }
