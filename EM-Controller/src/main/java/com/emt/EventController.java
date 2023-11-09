@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +38,11 @@ public class EventController {
     }
 
     //添加赛事
-    @PostMapping(path = "/save")
+    @PostMapping(path = "/create")
     public Result saveEvent(@RequestBody Event event){
         LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
         lqw.eq(Event::getEventName, event.getEventName());
-        if(eventService.getOne(lqw) != null){
+        if(eventService.getOne(lqw) != null) {
             return Result.error("赛事名已存在");
         }
         eventService.save(event);
