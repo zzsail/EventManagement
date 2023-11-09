@@ -2,6 +2,7 @@ package com.emt;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.emt.composite.ParticipantComposite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -19,6 +20,9 @@ public class ParticipantController {
 
     @Autowired
     private ParticipantService participantService;
+
+    @Autowired
+    private EventService eventService;
 
     private final Boolean IS_EXIST = true;
 
@@ -38,16 +42,29 @@ public class ParticipantController {
     }
 
     //添加参赛者
-    @PostMapping(path = "/save")
-    public Result saveParticipant(@RequestBody Participant participant){
+    @PostMapping(path = "/create")
+    public Result saveParticipant(@RequestBody ParticipantComposite participantComposite){
         LambdaQueryWrapper<Participant> lqw = new LambdaQueryWrapper<>();
         //根据参赛者联系方式是否存在判断参赛者是否存在
-        lqw.eq(Participant::getParticipantContactInfo, participant.getParticipantContactInfo());
+        lqw.eq(Participant::getParticipantContactInfo, participantComposite.getParticipantContactInfo());
         lqw.eq(Participant::getExist, IS_EXIST);
         Participant one = participantService.getOne(lqw);
         if(one != null){
             return Result.error("该参赛者已存在");
         }
+        Participant participant = new Participant();
+        participant.setParticipantName(participantComposite.getParticipantName());
+        participant.setParticipantAge(participantComposite.getParticipantAge());
+        participant.setParticipantGender(participantComposite.getParticipantGender());
+        participant.setParticipantContactInfo(participantComposite.getParticipantContactInfo());
+        LambdaQueryWrapper<Event> lqw2 = new LambdaQueryWrapper<>();
+        lqw2.eq(Event::getEventName, participantComposite.getEventName());
+        lqw2.eq(Event::getExist, IS_EXIST);
+        Event one2 = eventService.getOne(lqw2);
+        if (one2 == null){
+            return Result.error("该赛事不存在");
+        }
+        participant.setEventId(one2.getEventId());
         participantService.save(participant);
         return Result.success();
 

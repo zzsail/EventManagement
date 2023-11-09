@@ -6,4 +6,6 @@ import lombok.Data;
 @Data
 public class AwardWinnerComposite extends AwardWinner {
     private String awardName;
+
+    private String participantName;
 }
