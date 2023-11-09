@@ -61,7 +61,9 @@ public class ParticipantController {
         }catch (Exception e) {
             return Result.error("参赛者已存在");
         }
-        return Result.success();
+        Map<String, Object> map = new HashMap<>();
+        map.put("participant", participant);
+        return Result.success(map);
     }
 
     @PostMapping("/delete")
