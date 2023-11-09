@@ -74,9 +74,11 @@ public class EventController {
         try {
             eventService.updateById(event);
         } catch (Exception e) {
-            return Result.error("赛事Id已存在");
+            return Result.error("赛事已存在");
         }
-        return Result.success();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("event", event);
+        return Result.success(map);
     }
 
     //删除赛事

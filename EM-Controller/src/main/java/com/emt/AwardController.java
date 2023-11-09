@@ -3,12 +3,17 @@ package com.emt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.emt.composite.AwardComposite;
+import org.apache.ibatis.annotations.Lang;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.AbstractWebArgumentResolverAdapter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -64,4 +69,46 @@ public class AwardController {
         return Result.success();
 
     }
+
+    //修改奖项
+    @Transactional
+    @PutMapping("/update")
+    public Result update(@RequestBody Award award){
+        try {
+            awardService.updateById(award);
+        } catch (Exception e) {
+            return Result.error("奖项已存在");
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("award", award);
+        return Result.success(map);
+    }
+
+    //删除奖项
+    @PostMapping("/delete")
+    public Result delete(Long awardId){
+        Award award = awardService.getById(awardId);
+        if(award == null){
+            return Result.error("该奖项不存在");
+        }
+        award.setExist(IS_NOT_EXIST);
+        award.setAwardName(award.getAwardName() + '$' + UUID.randomUUID());//生成原奖项名+uuid
+        LambdaQueryWrapper<Award> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Award::getAwardId, awardId);
+        awardService.update(award, lqw);
+        return Result.success();
+    }
+
+    //查询奖项
+    @GetMapping("/select")
+    public Result select(String awardName){
+        LambdaQueryWrapper<Award> lqw = new LambdaQueryWrapper<>();
+        lqw.like(Award::getAwardName, awardName);
+        lqw.eq(Award::getExist, IS_EXIST);
+        List<Award> awards = awardService.list(lqw);
+        Map<String, Object> map = new HashMap<>();
+        map.put("awards", awards);
+        return Result.success(map);
+    }
+
 }
