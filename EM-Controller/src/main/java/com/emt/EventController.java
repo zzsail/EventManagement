@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,6 +24,9 @@ public class EventController {
     private EventService eventService;
     @Autowired
     private EventCategoryService eventCategoryService;
+
+    @Autowired
+    private RatingService ratingService;
 
     private final Boolean IS_EXIST = true;
     private final Boolean IS_NOT_EXIST = false;
@@ -38,7 +42,17 @@ public class EventController {
         List<Event> records = eventService.page(pages, lqw).getRecords();
         List<EventComposite> recordsComposite = new ArrayList<>();
         records.stream().forEach(item -> {
-            EventComposite eventComposite = setAttribute(item);
+            LambdaQueryWrapper<Rating> lqw3 = new LambdaQueryWrapper<>();
+            lqw3.eq(Rating::getEventId, item.getEventId());
+            List<Rating> list = ratingService.list(lqw3);
+            BigDecimal ratingValue = null;
+            for (Rating rating : list) {
+                ratingValue.add(rating.getRatingValue());
+            }
+            ratingValue.divide(BigDecimal.valueOf(list.size()));
+            EventComposite eventComposite = new EventComposite();
+            eventComposite = setAttribute(eventComposite);
+            eventComposite.setRatingValue(ratingValue);
             recordsComposite.add(eventComposite);
         });
         Page<EventComposite> newPages = new Page<>();
@@ -61,8 +75,11 @@ public class EventController {
         if (one != null){
             return Result.error("该赛事已存在");
         }
-        Event event = eventComposite;
-
+        Event event = new Event();
+        event.setEventName(eventComposite.getEventName());
+        event.setEventDate(eventComposite.getEventDate());
+        event.setEventLocation(eventComposite.getEventLocation());
+        event.setEventDescription(eventComposite.getEventDescription());
         String category = eventComposite.getCategoryName();
         LambdaQueryWrapper<EventCategory> lqw2 = new LambdaQueryWrapper<>();
         lqw2.eq(EventCategory::getCategoryName, category);
@@ -84,9 +101,8 @@ public class EventController {
         } catch (Exception e) {
             return Result.error("赛事已存在");
         }
-        EventComposite eventComposite = setAttribute(event);
         HashMap<String, Object> map = new HashMap<>();
-        map.put("event", eventComposite);
+        map.put("event", event);
         return Result.success(map);
     }
 
