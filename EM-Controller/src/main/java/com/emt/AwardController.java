@@ -1,19 +1,18 @@
 package com.emt;
 
+import com.alibaba.druid.sql.ast.expr.SQLCaseExpr;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.emt.composite.AwardComposite;
 import org.apache.ibatis.annotations.Lang;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.AbstractWebArgumentResolverAdapter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @CrossOrigin
 @RestController
@@ -37,9 +36,25 @@ public class AwardController {
         LambdaQueryWrapper<Award> lqw = new LambdaQueryWrapper<>();
         lqw.like(StringUtils.hasText(awardName), Award::getAwardName, awardName);
         lqw.eq(Award::getExist, IS_EXIST);
-        awardService.page(pages, lqw);
+        List<Award> records = awardService.page(pages, lqw).getRecords();
+        List<AwardComposite> recordsComposite = new ArrayList<>();
+        records.stream().forEach(item -> {
+            AwardComposite awardComposite = setAttribute(item);
+            //根据赛事id查找赛事名
+            LambdaQueryWrapper<Event> lqw2 = new LambdaQueryWrapper<>();
+            lqw2.eq(Event::getEventId, item.getEventId());
+            lqw2.eq(Event::getExist, IS_EXIST);
+            Event one = eventService.getOne(lqw2);
+            awardComposite.setEventName(one.getEventName());
+            recordsComposite.add(awardComposite);
+        });
+        Page<AwardComposite> newPages = new Page<>();
+        BeanUtils.copyProperties(pages, newPages);
+        newPages.setRecords(recordsComposite);
+
+
         Map<String, Object> map = new HashMap<>();
-        map.put("items", pages);
+        map.put("items", newPages);
         return Result.success(map);
     }
 
@@ -53,9 +68,7 @@ public class AwardController {
         if (one != null){
             return Result.error("该奖项已存在");
         }
-        Award award = new Award();
-        award.setAwardName(awardComposite.getAwardName());
-        award.setAwardDescription(awardComposite.getAwardDescription());
+        Award award = awardComposite;
         String eventName = awardComposite.getEventName();
         LambdaQueryWrapper<Event> lqw2 = new LambdaQueryWrapper<>();
         lqw2.eq(Event::getEventName, eventName);
@@ -79,8 +92,9 @@ public class AwardController {
         } catch (Exception e) {
             return Result.error("奖项已存在");
         }
+        AwardComposite awardComposite = setAttribute(award);
         HashMap<String, Object> map = new HashMap<>();
-        map.put("award", award);
+        map.put("award", awardComposite);
         return Result.success(map);
     }
 
@@ -109,6 +123,13 @@ public class AwardController {
         Map<String, Object> map = new HashMap<>();
         map.put("awards", awards);
         return Result.success(map);
+    }
+
+    public AwardComposite setAttribute(Award item){
+        AwardComposite awardComposite = new AwardComposite();
+        awardComposite.setAwardName(item.getAwardName());
+        awardComposite.setAwardDescription(item.getAwardDescription());
+        return awardComposite;
     }
 
 }

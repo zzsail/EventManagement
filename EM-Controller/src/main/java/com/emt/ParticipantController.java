@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.emt.composite.ParticipantComposite;
 import jakarta.servlet.http.Part;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -51,10 +52,14 @@ public class ParticipantController {
             lqw3.eq(Event::getExist, IS_EXIST);
             Event one1 = eventService.getOne(lqw3);
             participantComposite.setEventName(one1.getEventName());
+            recordsComposite.add(participantComposite);
         });
-        participantService.page(pages, lqw);
+        Page<ParticipantComposite> newPages = new Page<>();
+        BeanUtils.copyProperties(pages, newPages);
+        newPages.setRecords(recordsComposite);
+
         Map<String, Object> map = new HashMap<>();
-        map.put("items", pages);
+        map.put("items", newPages);
         return Result.success(map);
     }
 
