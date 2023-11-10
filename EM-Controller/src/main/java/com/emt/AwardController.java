@@ -69,6 +69,7 @@ public class AwardController {
             return Result.error("该奖项已存在");
         }
         Award award = awardComposite;
+        //根据赛事名获取赛事id
         String eventName = awardComposite.getEventName();
         LambdaQueryWrapper<Event> lqw2 = new LambdaQueryWrapper<>();
         lqw2.eq(Event::getEventName, eventName);

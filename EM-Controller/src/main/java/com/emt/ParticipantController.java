@@ -41,12 +41,14 @@ public class ParticipantController {
         List<Participant> records = participantService.page(pages, lqw).getRecords();
         List<ParticipantComposite> recordsComposite = new ArrayList<>();
         records.stream().forEach(item -> {
+            //根据用户id获取用户名
             ParticipantComposite participantComposite = setAttribute(item);
             LambdaQueryWrapper<User> lqw2 = new LambdaQueryWrapper<>();
             lqw2.eq(User::getUserId, item.getUserId());
             lqw2.eq(User::getExist, IS_EXIST);
             User one = userService.getOne(lqw2);
             participantComposite.setUserName(one.getUsername());
+            //根据赛事id获取赛事名
             LambdaQueryWrapper<Event> lqw3 = new LambdaQueryWrapper<>();
             lqw3.eq(Event::getEventId, item.getEventId());
             lqw3.eq(Event::getExist, IS_EXIST);
@@ -75,6 +77,7 @@ public class ParticipantController {
             return Result.error("该参赛者已存在");
         }
         Participant participant = participantComposite;
+        //根据赛事名获取赛事id
         LambdaQueryWrapper<Event> lqw2 = new LambdaQueryWrapper<>();
         lqw2.eq(Event::getEventName, participantComposite.getEventName());
         lqw2.eq(Event::getExist, IS_EXIST);
@@ -83,6 +86,7 @@ public class ParticipantController {
             return Result.error("该赛事不存在");
         }
         participant.setEventId(one2.getEventId());
+        //根据用户名获取用户id
         LambdaQueryWrapper<User> lqw3 = new LambdaQueryWrapper<>();
         lqw3.eq(User::getUsername, participantComposite.getUserName());
         lqw3.eq(User::getExist, IS_EXIST);
