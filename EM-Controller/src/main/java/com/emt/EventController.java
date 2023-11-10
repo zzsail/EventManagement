@@ -62,7 +62,6 @@ public class EventController {
             return Result.error("该赛事已存在");
         }
         Event event = eventComposite;
-
         String category = eventComposite.getCategoryName();
         LambdaQueryWrapper<EventCategory> lqw2 = new LambdaQueryWrapper<>();
         lqw2.eq(EventCategory::getCategoryName, category);
@@ -72,7 +71,15 @@ public class EventController {
         }
         event.setCategoryId(one1.getCategoryId());
         eventService.save(event);
-        return Result.success();
+        if(LocalDate.now().isBefore(eventComposite.getEventDate())) {
+            eventComposite.setStatus(true);
+        }
+        else {
+            eventComposite.setStatus(false);
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("event",eventComposite);
+        return Result.success(map);
     }
 
     //修改赛事信息
@@ -85,6 +92,7 @@ public class EventController {
             return Result.error("赛事已存在");
         }
         EventComposite eventComposite = setAttribute(event);
+
         HashMap<String, Object> map = new HashMap<>();
         map.put("event", eventComposite);
         return Result.success(map);
