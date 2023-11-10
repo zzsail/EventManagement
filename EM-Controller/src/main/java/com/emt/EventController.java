@@ -3,15 +3,16 @@ package com.emt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.emt.composite.EventComposite;
+import org.apache.ibatis.annotations.Delete;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @CrossOrigin
 @RestController
@@ -34,9 +35,32 @@ public class EventController {
         lqw.like(StringUtils.hasText(eventName), Event::getEventName, eventName);
         lqw.eq(Event::getExist, IS_EXIST);
         lqw.orderByDesc(Event::getEventDate);
-        eventService.page(pages, lqw);
+        List<Event> records = eventService.page(pages, lqw).getRecords();
+        List<EventComposite> recordsComposite = new ArrayList<>();
+        records.stream().forEach(item -> {
+            EventComposite eventComposite = new EventComposite();
+            eventComposite.setEventId(item.getEventId());
+            eventComposite.setEventDate(item.getEventDate());
+            eventComposite.setEventDescription(item.getEventDescription());
+            eventComposite.setEventLocation(item.getEventLocation());
+            eventComposite.setEventName(item.getEventName());
+            eventComposite.setCategoryId(item.getCategoryId());
+            eventComposite.setCategoryName(eventCategoryService.getById(item.getCategoryId()).getCategoryName());
+            if(LocalDate.now().isBefore(item.getEventDate())) {
+                eventComposite.setStatus(true);
+            }
+            else {
+                eventComposite.setStatus(false);
+            }
+            recordsComposite.add(eventComposite);
+        });
+        Page<EventComposite> newPages = new Page<>();
+        BeanUtils.copyProperties(pages,newPages);
+        newPages.setRecords(recordsComposite);
+
+
         Map<String, Object> map = new HashMap<>();
-        map.put("items", pages);
+        map.put("items", newPages);
         return Result.success(map);
     }
 

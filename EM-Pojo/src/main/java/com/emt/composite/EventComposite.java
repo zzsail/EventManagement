@@ -12,4 +12,5 @@ public class EventComposite extends Event {
     private String categoryName;
     private BigDecimal ratingValue;
     private BigInteger participantNum;
+    private Boolean status;
 }
