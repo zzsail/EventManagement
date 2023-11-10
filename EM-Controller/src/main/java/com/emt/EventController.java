@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,6 +24,9 @@ public class EventController {
     private EventService eventService;
     @Autowired
     private EventCategoryService eventCategoryService;
+
+    @Autowired
+    private RatingService ratingService;
 
     private final Boolean IS_EXIST = true;
     private final Boolean IS_NOT_EXIST = false;
@@ -38,7 +42,16 @@ public class EventController {
         List<Event> records = eventService.page(pages, lqw).getRecords();
         List<EventComposite> recordsComposite = new ArrayList<>();
         records.stream().forEach(item -> {
+            LambdaQueryWrapper<Rating> lqw3 = new LambdaQueryWrapper<>();
+            lqw3.eq(Rating::getEventId, item.getEventId());
+            List<Rating> list = ratingService.list(lqw3);
+            BigDecimal ratingValue = null;
+            for (Rating rating : list) {
+                ratingValue.add(rating.getRatingValue());
+            }
+            ratingValue.divide(BigDecimal.valueOf(list.size()));
             EventComposite eventComposite = setAttribute(item);
+            eventComposite.setRatingValue(ratingValue);
             recordsComposite.add(eventComposite);
         });
         Page<EventComposite> newPages = new Page<>();
