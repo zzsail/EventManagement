@@ -38,20 +38,7 @@ public class EventController {
         List<Event> records = eventService.page(pages, lqw).getRecords();
         List<EventComposite> recordsComposite = new ArrayList<>();
         records.stream().forEach(item -> {
-            EventComposite eventComposite = new EventComposite();
-            eventComposite.setEventId(item.getEventId());
-            eventComposite.setEventDate(item.getEventDate());
-            eventComposite.setEventDescription(item.getEventDescription());
-            eventComposite.setEventLocation(item.getEventLocation());
-            eventComposite.setEventName(item.getEventName());
-            eventComposite.setCategoryId(item.getCategoryId());
-            eventComposite.setCategoryName(eventCategoryService.getById(item.getCategoryId()).getCategoryName());
-            if(LocalDate.now().isBefore(item.getEventDate())) {
-                eventComposite.setStatus(true);
-            }
-            else {
-                eventComposite.setStatus(false);
-            }
+            EventComposite eventComposite = setAttribute(item);
             recordsComposite.add(eventComposite);
         });
         Page<EventComposite> newPages = new Page<>();
@@ -74,11 +61,8 @@ public class EventController {
         if (one != null){
             return Result.error("该赛事已存在");
         }
-        Event event = new Event();
-        event.setEventName(eventComposite.getEventName());
-        event.setEventDate(eventComposite.getEventDate());
-        event.setEventLocation(eventComposite.getEventLocation());
-        event.setEventDescription(eventComposite.getEventDescription());
+        Event event = eventComposite;
+
         String category = eventComposite.getCategoryName();
         LambdaQueryWrapper<EventCategory> lqw2 = new LambdaQueryWrapper<>();
         lqw2.eq(EventCategory::getCategoryName, category);
@@ -100,8 +84,9 @@ public class EventController {
         } catch (Exception e) {
             return Result.error("赛事已存在");
         }
+        EventComposite eventComposite = setAttribute(event);
         HashMap<String, Object> map = new HashMap<>();
-        map.put("event", event);
+        map.put("event", eventComposite);
         return Result.success(map);
     }
 
@@ -131,6 +116,24 @@ public class EventController {
         Map<String, Object> eventMap = new HashMap<>();
         eventMap.put("events", events);
         return Result.success(eventMap);
+    }
+
+    public EventComposite setAttribute(Event item) {
+        EventComposite eventComposite = new EventComposite();
+        eventComposite.setEventId(item.getEventId());
+        eventComposite.setEventDate(item.getEventDate());
+        eventComposite.setEventDescription(item.getEventDescription());
+        eventComposite.setEventLocation(item.getEventLocation());
+        eventComposite.setEventName(item.getEventName());
+        eventComposite.setCategoryId(item.getCategoryId());
+        eventComposite.setCategoryName(eventCategoryService.getById(item.getCategoryId()).getCategoryName());
+        if(LocalDate.now().isBefore(item.getEventDate())) {
+            eventComposite.setStatus(true);
+        }
+        else {
+            eventComposite.setStatus(false);
+        }
+        return eventComposite;
     }
 
 }
