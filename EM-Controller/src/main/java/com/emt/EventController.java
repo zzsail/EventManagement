@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -24,9 +25,10 @@ public class EventController {
     private EventService eventService;
     @Autowired
     private EventCategoryService eventCategoryService;
-
     @Autowired
     private RatingService ratingService;
+
+    private ParticipantService participantService;
 
     private final Boolean IS_EXIST = true;
     private final Boolean IS_NOT_EXIST = false;
@@ -42,6 +44,7 @@ public class EventController {
         List<Event> records = eventService.page(pages, lqw).getRecords();
         List<EventComposite> recordsComposite = new ArrayList<>();
         records.stream().forEach(item -> {
+            //赛事评分
             LambdaQueryWrapper<Rating> lqw3 = new LambdaQueryWrapper<>();
             lqw3.eq(Rating::getEventId, item.getEventId());
             List<Rating> list = ratingService.list(lqw3);
@@ -52,6 +55,12 @@ public class EventController {
             ratingValue.divide(BigDecimal.valueOf(list.size()));
             EventComposite eventComposite = setAttribute(item);
             eventComposite.setRatingValue(ratingValue);
+            //赛事参赛人数
+            LambdaQueryWrapper<Participant> lqw4 = new LambdaQueryWrapper<>();
+            lqw4.eq(Participant::getEventId, item.getEventId());
+            lqw4.eq(Participant::getExist, IS_EXIST);
+            List<Participant> list1 = participantService.list(lqw4);
+            eventComposite.setParticipantNum(BigInteger.valueOf(list.size()));
             recordsComposite.add(eventComposite);
         });
         Page<EventComposite> newPages = new Page<>();
