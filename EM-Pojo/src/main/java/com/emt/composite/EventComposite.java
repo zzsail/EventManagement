@@ -11,6 +11,6 @@ import java.math.BigInteger;
 public class EventComposite extends Event {
     private String categoryName;
     private BigDecimal ratingValue;
-    private BigInteger participantNum;
+    private Integer participantNum;
     private Boolean status;
 }

@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @CrossOrigin
@@ -60,7 +60,11 @@ public class EventController {
                         ratingValue = ratingValue.add(rating.getRatingValue());
                     }
                 }
-                ratingValue = ratingValue.divide(BigDecimal.valueOf(list.size()));
+                try {
+                    ratingValue = ratingValue.divide(BigDecimal.valueOf(list.size()));
+                } catch (Exception e) {
+                    ratingValue = BigDecimal.ZERO;
+                }
                 eventComposite.setRatingValue(ratingValue);
 
             }
@@ -72,9 +76,9 @@ public class EventController {
             lqw4.eq(Participant::getExist, IS_EXIST);
             List<Participant> list1 = participantService.list(lqw4);
             if(list1 == null){
-                eventComposite.setParticipantNum(BigInteger.valueOf(0));
+                eventComposite.setParticipantNum(0);
             }else {
-                eventComposite.setParticipantNum(BigInteger.valueOf(list1.size()));
+                eventComposite.setParticipantNum(list.size());
             }
 
             recordsComposite.add(eventComposite);
@@ -115,6 +119,8 @@ public class EventController {
         else {
             eventComposite.setStatus(false);
         }
+        eventComposite.setParticipantNum(0);
+        eventComposite.setRatingValue(BigDecimal.valueOf(0));
         HashMap<String, Object> map = new HashMap<>();
         map.put("event",eventComposite);
         return Result.success(map);
@@ -163,6 +169,35 @@ public class EventController {
         eventMap.put("events", events);
         return Result.success(eventMap);
     }
+    @GetMapping("/load")
+    public Result load(Integer pageNum, Integer pageSize){
+        Page<Event> pages = new Page<>(pageNum,pageSize);
+        LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<EventCategory> lqw2 = new LambdaQueryWrapper<>();
+        lqw.eq(Event::getExist,true);
+        lqw.orderByDesc(Event::getEventDate);
+        List<EventComposite> list = new ArrayList<>();
+        List<Event> records = eventService.page(pages, lqw).getRecords();
+        records.stream().forEach(event -> {
+            EventComposite eventComposite = setAttribute(event);
+            list.add(eventComposite);
+        });
+        Page<EventComposite> newPages = new Page<>();
+        newPages.setRecords(list);
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", newPages);
+        return Result.success(map);
+    }
+    @PostMapping("/upload")
+    public Result upload(@RequestParam(value = "file") MultipartFile multipartFile){
+        if(multipartFile.isEmpty()){
+            return Result.error("文件错误");
+        }
+        String uploadImage = UploadUtils.uploadImage(multipartFile);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("image",uploadImage);
+        return Result.success(map);
+    }
 
     public EventComposite setAttribute(Event item) {
         EventComposite eventComposite = new EventComposite();
@@ -171,6 +206,7 @@ public class EventController {
         eventComposite.setEventDescription(item.getEventDescription());
         eventComposite.setEventLocation(item.getEventLocation());
         eventComposite.setEventName(item.getEventName());
+        eventComposite.setEventImage(item.getEventImage());
         eventComposite.setCategoryId(item.getCategoryId());
         eventComposite.setCategoryName((eventCategoryService.getById(item.getCategoryId())).getCategoryName());
         if(LocalDate.now().isBefore(item.getEventDate())) {
