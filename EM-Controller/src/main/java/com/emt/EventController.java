@@ -46,40 +46,7 @@ public class EventController {
         List<EventComposite> recordsComposite = new ArrayList<>();
         records.stream().forEach(item -> {
             EventComposite eventComposite = setAttribute(item);
-            //赛事评分
-            LambdaQueryWrapper<Rating> lqw3 = new LambdaQueryWrapper<>();
-            lqw3.eq(Rating::getEventId, item.getEventId());
-            lqw3.eq(Rating::getExist, IS_EXIST);
-            List<Rating> list = ratingService.list(lqw3);
-            if (list == null){
-                eventComposite.setRatingValue(null);
-            }else {
-                BigDecimal ratingValue = BigDecimal.valueOf(0);
-                for (Rating rating : list) {
-                    if (rating.getRatingValue() != null){
-                        ratingValue = ratingValue.add(rating.getRatingValue());
-                    }
-                }
-                try {
-                    ratingValue = ratingValue.divide(BigDecimal.valueOf(list.size()));
-                } catch (Exception e) {
-                    ratingValue = BigDecimal.ZERO;
-                }
-                eventComposite.setRatingValue(ratingValue);
 
-            }
-
-
-            //赛事参赛人数
-            LambdaQueryWrapper<Participant> lqw4 = new LambdaQueryWrapper<>();
-            lqw4.eq(Participant::getEventId, item.getEventId());
-            lqw4.eq(Participant::getExist, IS_EXIST);
-            List<Participant> list1 = participantService.list(lqw4);
-            if(list1 == null){
-                eventComposite.setParticipantNum(0);
-            }else {
-                eventComposite.setParticipantNum(list.size());
-            }
 
             recordsComposite.add(eventComposite);
         });
@@ -157,7 +124,18 @@ public class EventController {
         eventService.update(event, lqw);
         return Result.success();
     }
-
+    //查看赛事信息
+    @GetMapping("/info/{id}")
+    public Result infoById(@PathVariable String id){
+        LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Event::getEventId,id);
+        lqw.eq(Event::getExist,true);
+        Event event = eventService.getOne(lqw);
+        EventComposite eventComposite = setAttribute(event);
+        Map<String, Object> map = new HashMap<>();
+        map.put("info",eventComposite);
+        return Result.success(map);
+    }
     //查询赛事
     @GetMapping("/select")
     public Result select(String eventName){
@@ -207,6 +185,7 @@ public class EventController {
         eventComposite.setEventLocation(item.getEventLocation());
         eventComposite.setEventName(item.getEventName());
         eventComposite.setEventImage(item.getEventImage());
+        eventComposite.setExist(item.getExist());
         eventComposite.setCategoryId(item.getCategoryId());
         eventComposite.setCategoryName((eventCategoryService.getById(item.getCategoryId())).getCategoryName());
         if(LocalDate.now().isBefore(item.getEventDate())) {
@@ -214,6 +193,38 @@ public class EventController {
         }
         else {
             eventComposite.setStatus(false);
+        }
+        //赛事评分
+        LambdaQueryWrapper<Rating> lqw3 = new LambdaQueryWrapper<>();
+        lqw3.eq(Rating::getEventId, item.getEventId());
+        lqw3.eq(Rating::getExist, IS_EXIST);
+        List<Rating> list = ratingService.list(lqw3);
+        if (list == null){
+            eventComposite.setRatingValue(null);
+        }else {
+            BigDecimal ratingValue = BigDecimal.valueOf(0);
+            for (Rating rating : list) {
+                if (rating.getRatingValue() != null){
+                    ratingValue = ratingValue.add(rating.getRatingValue());
+                }
+            }
+            try {
+                ratingValue = ratingValue.divide(BigDecimal.valueOf(list.size()));
+            } catch (Exception e) {
+                ratingValue = BigDecimal.ZERO;
+            }
+            eventComposite.setRatingValue(ratingValue);
+
+        }
+        //赛事参赛人数
+        LambdaQueryWrapper<Participant> lqw4 = new LambdaQueryWrapper<>();
+        lqw4.eq(Participant::getEventId, item.getEventId());
+        lqw4.eq(Participant::getExist, IS_EXIST);
+        List<Participant> list1 = participantService.list(lqw4);
+        if(list1 == null){
+            eventComposite.setParticipantNum(0);
+        }else {
+            eventComposite.setParticipantNum(list.size());
         }
         return eventComposite;
     }
