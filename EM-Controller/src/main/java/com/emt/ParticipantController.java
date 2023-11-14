@@ -43,7 +43,6 @@ public class ParticipantController {
         records.stream().forEach(item -> {
             //根据用户id获取用户名
             ParticipantComposite participantComposite = setAttribute(item);
-
             recordsComposite.add(participantComposite);
         });
         Page<ParticipantComposite> newPages = new Page<>();
@@ -150,7 +149,6 @@ public class ParticipantController {
         lqw2.eq(User::getUserId, item.getUserId());
         lqw2.eq(User::getExist, IS_EXIST);
         User one = userService.getOne(lqw2);
-
         participantComposite.setUsername(one.getUsername());
         //根据赛事id获取赛事名
         LambdaQueryWrapper<Event> lqw3 = new LambdaQueryWrapper<>();

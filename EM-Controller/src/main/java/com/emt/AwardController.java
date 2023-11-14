@@ -40,12 +40,7 @@ public class AwardController {
         List<AwardComposite> recordsComposite = new ArrayList<>();
         records.stream().forEach(item -> {
             AwardComposite awardComposite = setAttribute(item);
-            //根据赛事id查找赛事名
-            LambdaQueryWrapper<Event> lqw2 = new LambdaQueryWrapper<>();
-            lqw2.eq(Event::getEventId, item.getEventId());
-            lqw2.eq(Event::getExist, IS_EXIST);
-            Event one = eventService.getOne(lqw2);
-            awardComposite.setEventName(one.getEventName());
+
             recordsComposite.add(awardComposite);
         });
         Page<AwardComposite> newPages = new Page<>();
@@ -74,26 +69,26 @@ public class AwardController {
         LambdaQueryWrapper<Event> lqw2 = new LambdaQueryWrapper<>();
         lqw2.eq(Event::getEventName, eventName);
         lqw2.eq(Event::getExist, IS_EXIST);
-        Event one1 = eventService.getOne(lqw2);
-        if(one1 == null){
-            return Result.error("该赛事不存在");
-        }
-        award.setEventId(one1.getEventId());
+        award.setEventId(eventService.getOne(lqw2).getEventId());
         awardService.save(award);
-        return Result.success();
+        awardComposite = setAttribute(award);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("award", awardComposite);
+        return Result.success(map);
 
     }
 
     //修改奖项
     @Transactional
     @PutMapping("/update")
-    public Result update(@RequestBody Award award){
+    public Result update(@RequestBody AwardComposite awardComposite){
+        Award award = awardComposite;
         try {
             awardService.updateById(award);
         } catch (Exception e) {
             return Result.error("奖项已存在");
         }
-        AwardComposite awardComposite = setAttribute(award);
+        awardComposite = setAttribute(award);
         HashMap<String, Object> map = new HashMap<>();
         map.put("award", awardComposite);
         return Result.success(map);
@@ -128,8 +123,17 @@ public class AwardController {
 
     public AwardComposite setAttribute(Award item){
         AwardComposite awardComposite = new AwardComposite();
+        awardComposite.setAwardId(item.getAwardId());
+        awardComposite.setEventId(item.getEventId());
         awardComposite.setAwardName(item.getAwardName());
         awardComposite.setAwardDescription(item.getAwardDescription());
+        awardComposite.setExist(item.getExist());
+        //根据赛事id查找赛事名
+        LambdaQueryWrapper<Event> lqw2 = new LambdaQueryWrapper<>();
+        lqw2.eq(Event::getEventId, item.getEventId());
+        lqw2.eq(Event::getExist, IS_EXIST);
+        Event one = eventService.getOne(lqw2);
+        awardComposite.setEventName(one.getEventName());
         return awardComposite;
     }
 
