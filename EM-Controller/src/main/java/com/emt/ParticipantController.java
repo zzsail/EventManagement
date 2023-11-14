@@ -43,17 +43,7 @@ public class ParticipantController {
         records.stream().forEach(item -> {
             //根据用户id获取用户名
             ParticipantComposite participantComposite = setAttribute(item);
-            LambdaQueryWrapper<User> lqw2 = new LambdaQueryWrapper<>();
-            lqw2.eq(User::getUserId, item.getUserId());
-            lqw2.eq(User::getExist, IS_EXIST);
-            User one = userService.getOne(lqw2);
-            participantComposite.setUserName(one.getUsername());
-            //根据赛事id获取赛事名
-            LambdaQueryWrapper<Event> lqw3 = new LambdaQueryWrapper<>();
-            lqw3.eq(Event::getEventId, item.getEventId());
-            lqw3.eq(Event::getExist, IS_EXIST);
-            Event one1 = eventService.getOne(lqw3);
-            participantComposite.setEventName(one1.getEventName());
+
             recordsComposite.add(participantComposite);
         });
         Page<ParticipantComposite> newPages = new Page<>();
@@ -88,7 +78,7 @@ public class ParticipantController {
         participant.setEventId(one2.getEventId());
         //根据用户名获取用户id
         LambdaQueryWrapper<User> lqw3 = new LambdaQueryWrapper<>();
-        lqw3.eq(User::getUsername, participantComposite.getUserName());
+        lqw3.eq(User::getUsername, participantComposite.getUsername());
         lqw3.eq(User::getExist, IS_EXIST);
         User one1 = userService.getOne(lqw3);
         if (one1 == null){
@@ -96,19 +86,23 @@ public class ParticipantController {
         }
         participant.setUserId(one1.getUserId());
         participantService.save(participant);
-        return Result.success();
+        participantComposite = setAttribute(participant);
+        Map<String, Object> map = new HashMap<>();
+        map.put("participant", participantComposite);
+        return Result.success(map);
 
     }
     //修改参赛者
     @Transactional
     @PutMapping("/update")
-    public Result update(@RequestBody Participant participant){
+    public Result update(@RequestBody Participant participantComposite){
+        Participant participant = participantComposite;
         try {
             participantService.updateById(participant);
         }catch (Exception e) {
             return Result.error("参赛者已存在");
         }
-        ParticipantComposite participantComposite = setAttribute(participant);
+        participantComposite = setAttribute(participant);
         Map<String, Object> map = new HashMap<>();
         map.put("participant", participantComposite);
         return Result.success(map);
@@ -144,10 +138,26 @@ public class ParticipantController {
 
     public ParticipantComposite setAttribute(Participant item){
         ParticipantComposite participantComposite = new ParticipantComposite();
+        participantComposite.setEventId(item.getEventId());
+        participantComposite.setParticipantId(item.getParticipantId());
+        participantComposite.setUserId(item.getUserId());
         participantComposite.setParticipantName(item.getParticipantName());
         participantComposite.setParticipantGender(item.getParticipantGender());
         participantComposite.setParticipantAge(item.getParticipantAge());
         participantComposite.setParticipantContactInfo(item.getParticipantContactInfo());
+        participantComposite.setExist(item.getExist());
+        LambdaQueryWrapper<User> lqw2 = new LambdaQueryWrapper<>();
+        lqw2.eq(User::getUserId, item.getUserId());
+        lqw2.eq(User::getExist, IS_EXIST);
+        User one = userService.getOne(lqw2);
+
+        participantComposite.setUsername(one.getUsername());
+        //根据赛事id获取赛事名
+        LambdaQueryWrapper<Event> lqw3 = new LambdaQueryWrapper<>();
+        lqw3.eq(Event::getEventId, item.getEventId());
+        lqw3.eq(Event::getExist, IS_EXIST);
+        Event one1 = eventService.getOne(lqw3);
+        participantComposite.setEventName(one1.getEventName());
         return participantComposite;
     }
 
