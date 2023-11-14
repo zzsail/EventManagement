@@ -7,5 +7,5 @@ import lombok.Data;
 public class ParticipantComposite extends Participant {
     private String eventName;
 
-    private String userName;
+    private String username;
 }
