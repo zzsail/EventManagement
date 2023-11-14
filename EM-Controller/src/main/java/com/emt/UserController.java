@@ -65,7 +65,7 @@ public class UserController {
         String[] split = str.split(",");
         Map<String, Object> map = new HashMap<>();
         map.put("username", split[0]);
-        map.put("power", split[1]);
+        map.put("role", split[1]);
         map.put("userId", split[2]);
         return Result.success(map);
     }

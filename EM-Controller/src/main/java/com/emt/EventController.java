@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @CrossOrigin
@@ -46,36 +46,7 @@ public class EventController {
         List<EventComposite> recordsComposite = new ArrayList<>();
         records.stream().forEach(item -> {
             EventComposite eventComposite = setAttribute(item);
-            //赛事评分
-            LambdaQueryWrapper<Rating> lqw3 = new LambdaQueryWrapper<>();
-            lqw3.eq(Rating::getEventId, item.getEventId());
-            lqw3.eq(Rating::getExist, IS_EXIST);
-            List<Rating> list = ratingService.list(lqw3);
-            if (list == null){
-                eventComposite.setRatingValue(null);
-            }else {
-                BigDecimal ratingValue = BigDecimal.valueOf(0);
-                for (Rating rating : list) {
-                    if (rating.getRatingValue() != null){
-                        ratingValue = ratingValue.add(rating.getRatingValue());
-                    }
-                }
-                ratingValue = ratingValue.divide(BigDecimal.valueOf(list.size()));
-                eventComposite.setRatingValue(ratingValue);
 
-            }
-
-
-            //赛事参赛人数
-            LambdaQueryWrapper<Participant> lqw4 = new LambdaQueryWrapper<>();
-            lqw4.eq(Participant::getEventId, item.getEventId());
-            lqw4.eq(Participant::getExist, IS_EXIST);
-            List<Participant> list1 = participantService.list(lqw4);
-            if(list1 == null){
-                eventComposite.setParticipantNum(BigInteger.valueOf(0));
-            }else {
-                eventComposite.setParticipantNum(BigInteger.valueOf(list1.size()));
-            }
 
             recordsComposite.add(eventComposite);
         });
@@ -115,6 +86,8 @@ public class EventController {
         else {
             eventComposite.setStatus(false);
         }
+        eventComposite.setParticipantNum(0);
+        eventComposite.setRatingValue(BigDecimal.valueOf(0));
         HashMap<String, Object> map = new HashMap<>();
         map.put("event",eventComposite);
         return Result.success(map);
@@ -151,7 +124,18 @@ public class EventController {
         eventService.update(event, lqw);
         return Result.success();
     }
-
+    //查看赛事信息
+    @GetMapping("/info/{id}")
+    public Result infoById(@PathVariable String id){
+        LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Event::getEventId,id);
+        lqw.eq(Event::getExist,true);
+        Event event = eventService.getOne(lqw);
+        EventComposite eventComposite = setAttribute(event);
+        Map<String, Object> map = new HashMap<>();
+        map.put("info",eventComposite);
+        return Result.success(map);
+    }
     //查询赛事
     @GetMapping("/select")
     public Result select(String eventName){
@@ -163,6 +147,35 @@ public class EventController {
         eventMap.put("events", events);
         return Result.success(eventMap);
     }
+    @GetMapping("/load")
+    public Result load(Integer pageNum, Integer pageSize){
+        Page<Event> pages = new Page<>(pageNum,pageSize);
+        LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<EventCategory> lqw2 = new LambdaQueryWrapper<>();
+        lqw.eq(Event::getExist,true);
+        lqw.orderByDesc(Event::getEventDate);
+        List<EventComposite> list = new ArrayList<>();
+        List<Event> records = eventService.page(pages, lqw).getRecords();
+        records.stream().forEach(event -> {
+            EventComposite eventComposite = setAttribute(event);
+            list.add(eventComposite);
+        });
+        Page<EventComposite> newPages = new Page<>();
+        newPages.setRecords(list);
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", newPages);
+        return Result.success(map);
+    }
+    @PostMapping("/upload")
+    public Result upload(@RequestParam(value = "file") MultipartFile multipartFile){
+        if(multipartFile.isEmpty()){
+            return Result.error("文件错误");
+        }
+        String uploadImage = UploadUtils.uploadImage(multipartFile);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("image",uploadImage);
+        return Result.success(map);
+    }
 
     public EventComposite setAttribute(Event item) {
         EventComposite eventComposite = new EventComposite();
@@ -171,6 +184,8 @@ public class EventController {
         eventComposite.setEventDescription(item.getEventDescription());
         eventComposite.setEventLocation(item.getEventLocation());
         eventComposite.setEventName(item.getEventName());
+        eventComposite.setEventImage(item.getEventImage());
+        eventComposite.setExist(item.getExist());
         eventComposite.setCategoryId(item.getCategoryId());
         eventComposite.setCategoryName((eventCategoryService.getById(item.getCategoryId())).getCategoryName());
         if(LocalDate.now().isBefore(item.getEventDate())) {
@@ -178,6 +193,38 @@ public class EventController {
         }
         else {
             eventComposite.setStatus(false);
+        }
+        //赛事评分
+        LambdaQueryWrapper<Rating> lqw3 = new LambdaQueryWrapper<>();
+        lqw3.eq(Rating::getEventId, item.getEventId());
+        lqw3.eq(Rating::getExist, IS_EXIST);
+        List<Rating> list = ratingService.list(lqw3);
+        if (list == null){
+            eventComposite.setRatingValue(null);
+        }else {
+            BigDecimal ratingValue = BigDecimal.valueOf(0);
+            for (Rating rating : list) {
+                if (rating.getRatingValue() != null){
+                    ratingValue = ratingValue.add(rating.getRatingValue());
+                }
+            }
+            try {
+                ratingValue = ratingValue.divide(BigDecimal.valueOf(list.size()));
+            } catch (Exception e) {
+                ratingValue = BigDecimal.ZERO;
+            }
+            eventComposite.setRatingValue(ratingValue);
+
+        }
+        //赛事参赛人数
+        LambdaQueryWrapper<Participant> lqw4 = new LambdaQueryWrapper<>();
+        lqw4.eq(Participant::getEventId, item.getEventId());
+        lqw4.eq(Participant::getExist, IS_EXIST);
+        List<Participant> list1 = participantService.list(lqw4);
+        if(list1 == null){
+            eventComposite.setParticipantNum(0);
+        }else {
+            eventComposite.setParticipantNum(list.size());
         }
         return eventComposite;
     }
