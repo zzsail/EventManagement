@@ -8,4 +8,6 @@ public class AwardWinnerComposite extends AwardWinner {
     private String awardName;
 
     private String participantName;
+
+    private String eventName;
 }
