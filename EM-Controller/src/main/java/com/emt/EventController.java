@@ -176,11 +176,12 @@ public class EventController {
         map.put("image",uploadImage);
         return Result.success(map);
     }
-    @PostMapping("/num")
+    @GetMapping("/num")
     public Result eventNum(){
         LocalDate futureDate = LocalDate.now().plusDays(7);
         LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
-        lqw.lt(Event::getEventDate, futureDate);
+        lqw.between(Event::getEventDate,LocalDate.now(),futureDate);
+        lqw.eq(Event::getExist, IS_EXIST);
         List<Event> list = eventService.list(lqw);
         Map<String, Object> map = new HashMap<>();
         map.put("num", list.size());
