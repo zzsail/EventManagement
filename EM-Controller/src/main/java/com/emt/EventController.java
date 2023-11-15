@@ -176,6 +176,16 @@ public class EventController {
         map.put("image",uploadImage);
         return Result.success(map);
     }
+    @PostMapping("/num")
+    public Result eventNum(){
+        LocalDate futureDate = LocalDate.now().plusDays(7);
+        LambdaQueryWrapper<Event> lqw = new LambdaQueryWrapper<>();
+        lqw.lt(Event::getEventDate, futureDate);
+        List<Event> list = eventService.list(lqw);
+        Map<String, Object> map = new HashMap<>();
+        map.put("num", list.size());
+        return Result.success(map);
+    }
 
     public EventComposite setAttribute(Event item) {
         EventComposite eventComposite = new EventComposite();
