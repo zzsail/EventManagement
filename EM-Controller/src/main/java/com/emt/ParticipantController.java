@@ -134,7 +134,14 @@ public class ParticipantController {
         participantMap.put("participants", participants);
         return Result.success(participantMap);
     }
+    @GetMapping("/num")
+    public Result getNum(){
+        Integer size = participantService.list().size();
+        Map<String,Object> map = new HashMap<>();
+        map.put("num", size);
+        return Result.success(map);
 
+    }
     public ParticipantComposite setAttribute(Participant item){
         ParticipantComposite participantComposite = new ParticipantComposite();
         participantComposite.setEventId(item.getEventId());
