@@ -46,10 +46,12 @@ public class AwardWinnerController {
         lqw.eq(User::getExist,IS_EXIST);
         lqw.eq(User::getUsername,username);
         User user = userService.getOne(lqw);
+        if(user == null) return Result.error("该用户不存在");
         LambdaQueryWrapper<Participant> lqw2 = new LambdaQueryWrapper<>();
         lqw2.eq(Participant::getExist,IS_EXIST);
         lqw2.eq(Participant::getUserId,user.getUserId());
         Participant participant = participantService.getOne(lqw2);
+        if(participant == null) return Result.error("该用户没有参赛");
         awardWinnerComposite.setParticipantId(participant.getParticipantId());
         awardWinnerComposite.setParticipantName(participant.getParticipantName());
         awardWinnerComposite.setExist(IS_EXIST);
